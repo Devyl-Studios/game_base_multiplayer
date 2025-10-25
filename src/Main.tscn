@@ -1,57 +1,50 @@
-[gd_scene load_steps=10 format=3 uid="uid://cf4ypyvw45qlw"]
+[gd_scene load_steps=8 format=3 uid="uid://cf4ypyvw45qlw"]
 
 [ext_resource type="Script" uid="uid://biq27kbqv465m" path="res://src/multi_player_manager.gd" id="1_4gxt3"]
 [ext_resource type="Script" uid="uid://eiwda1xlpsrn" path="res://src/game_world.gd" id="1_5qjmp"]
-[ext_resource type="Script" uid="uid://c07bv46yo0hoy" path="res://src/units.gd" id="1_hk4rc"]
 [ext_resource type="Script" uid="uid://bmclwnmhuvidp" path="res://src/unit_spawner.gd" id="2_chrbn"]
-
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_chrbn"]
-
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_5qjmp"]
+[ext_resource type="PackedScene" uid="uid://qoslefpgi73t" path="res://src/Unit.tscn" id="4_vjwby"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_4gxt3"]
-size = Vector3(10, 1, 9)
+size = Vector3(14, 1, 33)
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_4gxt3"]
+size = Vector2(2.86, 6.73)
 
-[sub_resource type="NavigationMesh" id="NavigationMesh_hk4rc"]
+[sub_resource type="NavigationMesh" id="NavigationMesh_5qjmp"]
 
 [node name="Main" type="Node3D"]
 
 [node name="GameWorld" type="Node3D" parent="."]
 script = ExtResource("1_5qjmp")
 
-[node name="Units" type="CharacterBody3D" parent="GameWorld"]
-script = ExtResource("1_hk4rc")
-
-[node name="NavigationAgent3D" type="NavigationAgent3D" parent="GameWorld/Units"]
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="GameWorld/Units"]
-mesh = SubResource("CapsuleMesh_chrbn")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="GameWorld/Units"]
-shape = SubResource("CapsuleShape3D_5qjmp")
+[node name="Units" type="Node3D" parent="GameWorld"]
 
 [node name="Terrain" type="StaticBody3D" parent="GameWorld"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.032929897, 1.0048232, -0.068398476)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.033, 1, -0.068)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="GameWorld/Terrain"]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0.2841997, 0, -4.6441097)
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 1, 0)
 shape = SubResource("BoxShape3D_4gxt3")
-debug_color = Color(0.5814223, 0.38274476, 1, 0.41960785)
+debug_color = Color(0.5604637, 0.3969167, 1, 0.41960785)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="GameWorld/Terrain"]
-transform = Transform3D(10.21, 0, 0, 0, 10.21, 0, 0, 0, 10.21, 0.055396557, -0.056502342, -4.55976)
+transform = Transform3D(10.21, 0, 0, 0, 10.21, 0, 0, 0, 10.21, 0, 0, 0)
+lod_bias = 0.001
 mesh = SubResource("PlaneMesh_4gxt3")
 
-[node name="NavigationRegion3D" type="NavigationRegion3D" parent="GameWorld"]
-navigation_mesh = SubResource("NavigationMesh_hk4rc")
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="GameWorld/Terrain"]
+navigation_mesh = SubResource("NavigationMesh_5qjmp")
 
 [node name="UnitSpawner" type="Node3D" parent="GameWorld"]
 script = ExtResource("2_chrbn")
+unit_scene = ExtResource("4_vjwby")
 
-[node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.9611317, 0.2760903, 0, -0.2760903, 0.9611317, -0.43843472, 7.788358, 12.531193)
+[node name="Camera3D" type="Camera3D" parent="GameWorld"]
+transform = Transform3D(1, 0, 0, 0, 0.99983937, 0.017923564, 0, -0.017923564, 0.99983937, 0.5615692, 11.788361, 42.53119)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="GameWorld"]
+transform = Transform3D(-4.371139e-08, 0.86602545, -0.49999997, 0, 0.49999997, 0.86602545, 1, 3.7855173e-08, -2.1855692e-08, -45, 7, -7)
 
 [node name="MultiPlayerManager" type="Node" parent="."]
 script = ExtResource("1_4gxt3")

@@ -12,7 +12,7 @@ config_version=5
 
 config/name="game"
 config/version="0.0.1"
-run/main_scene="uid://cf4ypyvw45qlw"
+run/main_scene="uid://cqg08lrhbwouf"
 config/features=PackedStringArray("4.5", "Forward Plus")
 config/icon="res://icon.svg"
 

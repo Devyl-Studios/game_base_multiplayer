@@ -9,6 +9,10 @@ func _ready():
 	navigation_agent = $NavigationAgent3D
 
 func _physics_process(_delta: float) -> void:
+	#print("Target:", navigation_agent.get_target_position(),
+	  #" Next:", navigation_agent.get_next_path_position(),
+	  #" Finished:", navigation_agent.is_navigation_finished())
+	#
 	if navigation_agent.is_navigation_finished():
 		velocity = Vector3.ZERO
 	else:
