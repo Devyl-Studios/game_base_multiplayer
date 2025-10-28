@@ -13,10 +13,15 @@ func _physics_process(_delta: float) -> void:
 	  #" Next:", navigation_agent.get_next_path_position(),
 	  #" Finished:", navigation_agent.is_navigation_finished())
 	#
+	
 	if navigation_agent.is_navigation_finished():
 		velocity = Vector3.ZERO
+		move_and_slide()
 	else:
 		var next_point = navigation_agent.get_next_path_position()
-		var direction = (next_point - global_position).normalized()
+		var direction = (global_position - next_point).normalized()
+		print(direction, "  ---  " ,owner_id)
 		velocity = direction * SPEED
+		#velocity.y = 0
+		print("  ---  " ,velocity)
 		move_and_slide()
