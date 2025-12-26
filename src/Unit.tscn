@@ -12,6 +12,7 @@ script = ExtResource("1_6ap6o")
 [node name="NavigationAgent3D" type="NavigationAgent3D" parent="."]
 target_desired_distance = 0.1
 path_height_offset = 1.0
+avoidance_enabled = true
 debug_enabled = true
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
