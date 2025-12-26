@@ -34,5 +34,6 @@ func _get_raycast_result(mouse_pos: Vector2) -> Vector3:
 	var result = space_state.intersect_ray(query)
 	
 	if result:
+		print("Result: ", result.position, "  Unit: ", unit)
 		return result.position
 	return Vector3.ZERO

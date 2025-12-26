@@ -15,6 +15,10 @@ func _ready():
 	navigation_agent.velocity_computed.connect(_on_velocity_computed)
 
 func _physics_process(delta: float) -> void:
+	# Only the server (authority) should calculate physics and movement.
+	# The clients will just receive the 'position' updates via the Synchronizer.
+	if not is_multiplayer_authority():
+		return
 	# 1. Apply Gravity (Standard Kinematics)
 	if not is_on_floor():
 		velocity.y -= GRAVITY * delta
