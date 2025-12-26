@@ -1,27 +1,62 @@
 extends CharacterBody3D
 
 const SPEED = 5.0
+const GRAVITY = 9.8
 
 @export var owner_id: int
-var navigation_agent: NavigationAgent3D
+
+# We use @onready to ensure the node is available before we access it.
+# This is syntactic sugar for initializing inside _ready().
+@onready var navigation_agent: NavigationAgent3D = $NavigationAgent3D
 
 func _ready():
-	navigation_agent = $NavigationAgent3D
+	# RTS Specific: Connect to the avoidance signal
+	# This ensures units don't overlap when swarming a target
+	navigation_agent.velocity_computed.connect(_on_velocity_computed)
 
-func _physics_process(_delta: float) -> void:
-	#print("Target:", navigation_agent.get_target_position(),
-	  #" Next:", navigation_agent.get_next_path_position(),
-	  #" Finished:", navigation_agent.is_navigation_finished())
-	#
-	
+func _physics_process(delta: float) -> void:
+	# 1. Apply Gravity (Standard Kinematics)
+	if not is_on_floor():
+		velocity.y -= GRAVITY * delta
+
+	# 2. Check if we have reached the destination
 	if navigation_agent.is_navigation_finished():
-		velocity = Vector3.ZERO
+		# Decelerate or stop. For crisp RTS movement, stopping is fine.
+		# We only set X and Z to zero to preserve falling speed (gravity)
+		velocity.x = move_toward(velocity.x, 0, SPEED)
+		velocity.z = move_toward(velocity.z, 0, SPEED)
 		move_and_slide()
-	else:
-		var next_point = navigation_agent.get_next_path_position()
-		var direction = (global_position - next_point).normalized()
-		print(direction, "  ---  " ,owner_id)
-		velocity = direction * SPEED
-		#velocity.y = 0
-		print("  ---  " ,velocity)
-		move_and_slide()
+		return
+
+	# 3. Calculate Pathfinding
+	var next_point = navigation_agent.get_next_path_position()
+	#print("Next Point", next_point)
+	
+	# Vector Math: Destination (next_point) - Origin (global_position)
+	var direction = (next_point - global_position).normalized()
+	direction.y = 0 # Ignore height differences for movement direction
+	direction = direction.normalized()
+	#print("Direction", direction)
+	
+	# 4. Request Velocity (Do not apply directly yet!)
+	var intended_velocity = direction * SPEED
+	
+	# Send this to the agent. The agent will calculate avoidance 
+	# and callback _on_velocity_computed with the "safe" velocity.
+	navigation_agent.set_velocity(intended_velocity)
+
+# The callback for RVO avoidance
+func _on_velocity_computed(safe_velocity: Vector3):
+	# Apply the safe velocity calculated by the navigation server
+	velocity.x = safe_velocity.x
+	velocity.z = safe_velocity.z
+	
+	#print("Velocity X", velocity.x)
+	#print("Velocity Z", velocity.z)
+	
+	# Move the physics body
+	move_and_slide()
+
+# Helper to set target externally (e.g. from your SelectionManager)
+func set_movement_target(target_point: Vector3):
+	navigation_agent.target_position = target_point

@@ -6,25 +6,3 @@
 layout_mode = 3
 anchors_preset = 0
 script = ExtResource("1_kevse")
-
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
-layout_mode = 0
-offset_right = 673.0
-offset_bottom = 400.0
-alignment = 1
-
-[node name="HostButton" type="Button" parent="VBoxContainer"]
-layout_mode = 2
-text = "Host Game"
-
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
-layout_mode = 2
-
-[node name="IpInput" type="LineEdit" parent="VBoxContainer/HBoxContainer"]
-layout_mode = 2
-placeholder_text = "Enter Ip: "
-expand_to_text_length = true
-
-[node name="JoinButton" type="Button" parent="VBoxContainer/HBoxContainer"]
-layout_mode = 2
-text = "Join Game"
