@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3 uid="uid://cf4ypyvw45qlw"]
 
-[ext_resource type="Script" path="res://src/camera_3d.gd" id="2_hk4rc"]
+[ext_resource type="Script" uid="uid://dyvgayp627r4n" path="res://src/camera_3d.gd" id="2_hk4rc"]
 [ext_resource type="Script" uid="uid://paqp0m0xiqih" path="res://src/multiplayer_spawner.gd" id="3_chrbn"]
 [ext_resource type="PackedScene" uid="uid://qoslefpgi73t" path="res://src/Unit.tscn" id="4_vjwby"]
 
@@ -17,9 +17,6 @@ navigation_mesh = SubResource("NavigationMesh_4gxt3")
 use_collision = true
 size = Vector3(21, 1, 29)
 
-[node name="Unit" parent="." instance=ExtResource("4_vjwby")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 0)
-
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.86602545, 0.5000001, 0, -0.5000001, 0.86602545, 0, 23, 32)
 
@@ -28,6 +25,9 @@ transform = Transform3D(1, 0, 0, 0, 0.9659259, 0.25881907, 0, -0.25881907, 0.965
 script = ExtResource("2_hk4rc")
 
 [node name="Units" type="Node3D" parent="."]
+
+[node name="Unit" parent="Units" instance=ExtResource("4_vjwby")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 0)
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
 _spawnable_scenes = PackedStringArray("uid://qoslefpgi73t")
