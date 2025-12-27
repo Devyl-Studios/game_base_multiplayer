@@ -92,7 +92,7 @@ func _on_peer_connected(id):
 		if unit_spawner:
 			var spawn_data = {
 				"peer_id": id,
-				"position": Vector3(randf_range(-2, 2), 0, randf_range(-2, 2))
+				"position": Vector3(randf_range(-2, 2), 2.0, randf_range(-2, 2))
 			}
 			
 			print(spawn_data)
@@ -117,6 +117,23 @@ func _on_peer_connected(id):
 			#unit.set_movement_target(target_pos)
 			## No need to RPC back to clients! 
 			## MultiplayerSynchronizer on the unit will sync the transform.
+			
+
+# RPC call for requesting a move incase we move to server authoritative model (highly likely)
+# ServeR-Authoritative
+@rpc("any_peer", "call_local", "reliable")
+func request_move_command(unit_path: NodePath, target_pos: Vector3):
+	var sender_id = multiplayer.get_remote_sender_id()
+	var unit = get_node_or_null(unit_path)
+	
+	# Server validates: Does this sender own this unit?
+	if multiplayer.is_server() and unit:
+		if unit.get_multiplayer_authority() == sender_id:
+			# Set the target on the server's instance of the unit
+			print("Server-Authoritative target_pos:", target_pos)
+			unit.navigation_agent.target_position = target_pos
+
+
 
 func find_unit_by_owner(owner_id: int) -> Node:
 	# Optimization: Consider using a Dictionary {owner_id: node_path} 

@@ -19,6 +19,7 @@ func _init():
 	## 3. Return the node; Godot adds it to the "Spawn Path" automatically
 	#return unit
 
+
 func _custom_spawn(data):
 	var unit_scene = preload("res://src/Unit.tscn")
 	var unit = unit_scene.instantiate()
@@ -34,3 +35,5 @@ func _custom_spawn(data):
 	unit.owner_id = data.peer_id
 	
 	return unit
+	
+	

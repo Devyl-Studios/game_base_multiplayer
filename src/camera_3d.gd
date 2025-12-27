@@ -67,8 +67,11 @@ func _handle_movement(mouse_pos: Vector2):
 		# Check if the dictionary is not empty
 		if not result.is_empty():
 			var target_pos = result.position
-			selected_unit.set_movement_target(target_pos)
-			#MultiPlayerManager.request_move_command.rpc(selected_unit.get_path(), target_pos)
+			# The physics process and simulation will be run by every player themselves
+			# and the MultiplayerSynchronizer will be sending the updated positions to
+			# all the peers connected to the network
+			#selected_unit.set_movement_target(target_pos)
+			MultiPlayerManager.request_move_command.rpc(selected_unit.get_path(), target_pos)
 
 
 
