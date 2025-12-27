@@ -13,6 +13,7 @@ func _ready():
 	# RTS Specific: Connect to the avoidance signal
 	# This ensures units don't overlap when swarming a target
 	
+	# Server-Authoritative
 	# The Unit is 'owned' by the player (for selection/input)
 	# BUT the Synchronizer must be 'owned' by the Server (to sync physics)
 	$MultiplayerSynchronizer.set_multiplayer_authority(1)
