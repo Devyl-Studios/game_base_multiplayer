@@ -25,12 +25,14 @@ func _on_tick():
 	current_tick += 1
 
 func execute_tick(tick_id: int):
+	# 1. Dispatch commands for this tick
 	var commands = command_buffer.get(tick_id, [])
 	for cmd in commands:
 		apply_command(cmd)
 	
-	# 2. Run the deterministic physics update for every unit
-	get_tree().call_group("units", "deterministic_update")
+	# 2. Run physics for all units
+	# We pass tick_rate as the 'fake' delta to keep movement speed consistent
+	get_tree().call_group("units", "deterministic_update", tick_rate)
 	
 	
 func apply_command(cmd: Dictionary):
@@ -41,7 +43,7 @@ func apply_command(cmd: Dictionary):
 	if units_container:
 		var unit = units_container.get_node_or_null(str(cmd.unit_id))
 		if unit:
-			unit.target_position = cmd.target
+			unit.set_movement_target(cmd.target)
 	
 	
 @rpc("any_peer", "call_local", "reliable")

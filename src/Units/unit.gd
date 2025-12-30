@@ -10,137 +10,54 @@ const GRAVITY = 9.8
 @onready var navigation_agent: NavigationAgent3D = $NavigationAgent3D
 var target_position: Vector3
 var grid_speed: float = 0.5 # Discrete distance per tick
+var speed = 5.0
 
-func deterministic_update():
-	# Simple float movement
-	if global_position.distance_to(target_position) > 0.1:
-		var direction = (target_position - global_position).normalized()
-		var speed = 0.2 # Adjust this per tick
-		global_position += direction * speed
-		
-		
-const UNIT_RADIUS: float = 0.8
-
-func resolve_collisions():
-	# Get all units in the game
-	var all_units = get_tree().get_nodes_in_group("units")
-	
-	for other in all_units:
-		if other == self:
-			continue
-			
-		# Calculate distance between units (on the XZ plane only)
-		var pos_self = Vector2(global_position.x, global_position.z)
-		var pos_other = Vector2(other.global_position.x, other.global_position.z)
-		var dist = pos_self.distance_to(pos_other)
-		
-		# If they overlap
-		if dist < UNIT_RADIUS:
-			# Calculate a push vector to move them apart
-			var overlap = UNIT_RADIUS - dist
-			var push_dir = (pos_self - pos_other).normalized()
-			
-			# If they are exactly on top of each other, pick a random direction
-			if push_dir == Vector2.ZERO:
-				push_dir = Vector2(1, 0)
-				
-			# Apply the push (Shift the position slightly)
-			var push_step = push_dir * (overlap * 0.5)
-			global_position.x += push_step.x
-			global_position.z += push_step.y
-			
-			
-
+@onready var nav_agent = $NavigationAgent3D
 func _ready():
-	# RTS Specific: Connect to the avoidance signal
-	# This ensures units don't overlap when swarming a target
-	
-	# Server-Authoritative
-	# The Unit is 'owned' by the player (for selection/input)
-	# BUT the Synchronizer must be 'owned' by the Server (to sync physics)
-	#$MultiplayerSynchronizer.set_multiplayer_authority(1)
-	#
-	#if multiplayer.is_server():
-		## Optional: ensure the server starts with a clean velocity
-		#velocity = Vector3.ZERO
-	
-	# Client-Authoritative
-	#navigation_agent.velocity_computed.connect(_on_velocity_computed)
-	target_position = global_position
+	# Add unit to the "units" group so SimulationManager can call deterministic_update on it
 	add_to_group("units")
-	# Server-Authoritative
-	#navigation_agent.velocity_computed.connect(_on_navigation_agent_3d_velocity_computed)
+	# Wait for the navigation map to be ready before using the navigation agent
+	call_deferred("_setup_navigation_agent")
 
-# Client-Authoritative
-#func _physics_process(delta: float) -> void:
-	## Only the server (authority) should calculate physics and movement.
-	## The clients will just receive the 'position' updates via the Synchronizer.
-	#if not is_multiplayer_authority():
-		#return
-	## 1. Apply Gravity (Standard Kinematics)
-	#if not is_on_floor():
-		#velocity.y -= GRAVITY * delta
-##
-	## 2. Check if we have reached the destination
-	#if navigation_agent.is_navigation_finished():
-		## Decelerate or stop. For crisp RTS movement, stopping is fine.
-		## We only set X and Z to zero to preserve falling speed (gravity)
-		#velocity.x = move_toward(velocity.x, 0, SPEED)
-		#velocity.z = move_toward(velocity.z, 0, SPEED)
-		#move_and_slide()
-		#return
-#
-	## 3. Calculate Pathfinding
-	#var next_point = navigation_agent.get_next_path_position()
-	##print("Next Point", next_point)
-	#
-	## Vector Math: Destination (next_point) - Origin (global_position)
-	#var direction = (next_point - global_position).normalized()
-	#direction.y = 0 # Ignore height differences for movement direction
-	#direction = direction.normalized()
-	##print("Direction", direction)
-	#
-	## 4. Request Velocity (Do not apply directly yet!)
-	#var intended_velocity = direction * SPEED
-	#
-	## Send this to the agent. The agent will calculate avoidance 
-	## and callback _on_velocity_computed with the "safe" velocity.
-	#navigation_agent.set_velocity(intended_velocity)
+func _setup_navigation_agent():
+	# Wait for the navigation map to be ready
+	await get_tree().physics_frame
+	# NavigationAgent3D needs to be aware of the unit's position
+	nav_agent.set_velocity(Vector3.ZERO)
 
+func deterministic_update(tick_delta: float):
+	# Update navigation agent's velocity so it knows the unit's current movement
+	# This helps NavigationAgent3D calculate avoidance properly
+	navigation_agent.set_velocity(velocity)
+	
+	# 1. CALCULATE HORIZONTAL VELOCITY (X and Z)
+	var move_velocity = Vector3.ZERO
+	if not navigation_agent.is_navigation_finished():
+		var next_p = navigation_agent.get_next_path_position()
+		# .direction_to is cleaner than (b-a).normalized()
+		var dir = global_position.direction_to(next_p)
+		move_velocity = Vector3(dir.x, 0, dir.z) * SPEED
+		
+		# Optional: Use your handle_rotation here
+		handle_rotation(tick_delta)
 
-# Server-Authoritative
-#func _physics_process(delta: float) -> void:
-	## Only the Server (ID 1) calculates movement for ALL units.
-	## Clients just watch the Synchronizer update the position.
-	#if not multiplayer.is_server():
-		#return
-	##print("Server is processing physics for: ", name)
-	## 1. Apply Gravity
-	#if not is_on_floor():
-		#velocity.y -= GRAVITY * delta
-#
-	## 2. Check if we have reached the destination
-	#if navigation_agent.is_navigation_finished():
-		#velocity.x = move_toward(velocity.x, 0, SPEED)
-		#velocity.z = move_toward(velocity.z, 0, SPEED)
-		#move_and_slide()
-		#return
-#
-	## 3. Calculate Pathfinding
-	#var next_point = navigation_agent.get_next_path_position()
-	#var direction = (next_point - global_position).normalized()
-	#direction.y = 0 
-	#direction = direction.normalized()
-	#
-	## 4. Request Velocity
-	#var intended_velocity = direction * SPEED
-	#
-	## If Avoidance is enabled, the agent calculates a safe path.
-	## This call triggers the '_on_navigation_agent_3d_velocity_computed' signal.
-	#handle_rotation(delta)
-	#navigation_agent.set_velocity(intended_velocity)
+	# 2. CALCULATE VERTICAL VELOCITY (Y)
+	if not is_on_floor():
+		velocity.y -= GRAVITY * tick_delta
+	else:
+		# Small downward force to keep the 'is_on_floor' check stable in Jolt
+		velocity.y = -0.1 
 
+	# 3. MERGE THEM
+	velocity.x = move_velocity.x
+	velocity.z = move_velocity.z
 
+	# 4. EXECUTE
+	# Note: Jolt requires move_and_slide to be called to update 'is_on_floor()'
+	move_and_slide()
+
+func set_movement_target(target: Vector3):
+	nav_agent.target_position = target
 
 
 # Add this inside your _physics_process or call it from there
@@ -167,20 +84,3 @@ func _on_navigation_agent_3d_velocity_computed(safe_velocity: Vector3) -> void:
 	velocity.x = safe_velocity.x
 	velocity.z = safe_velocity.z
 	move_and_slide()
-
-
-# The callback for RVO avoidance
-func _on_velocity_computed(safe_velocity: Vector3):
-	# Apply the safe velocity calculated by the navigation server
-	velocity.x = safe_velocity.x
-	velocity.z = safe_velocity.z
-	
-	#print("Velocity X", velocity.x)
-	#print("Velocity Z", velocity.z)
-	
-	# Move the physics body
-	move_and_slide()
-
-# Helper to set target externally (e.g. from your SelectionManager)
-func set_movement_target(target_point: Vector3):
-	navigation_agent.target_position = target_point

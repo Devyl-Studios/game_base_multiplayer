@@ -5,8 +5,6 @@ extends Camera3D
 
 var selected_unit: CharacterBody3D = null
 
-
-
 func _process(delta: float):
 	# This returns a Vector2 where x is (right - left) and y is (back - forward)
 	# It handles normalization for you!
@@ -22,9 +20,6 @@ func _process(delta: float):
 	global_position += direction * pan_speed * delta
 
 
-
-
-
 func _unhandled_input(event: InputEvent):
 	if event is InputEventMouseButton and event.pressed:
 		# LEFT CLICK: Select a unit
@@ -34,8 +29,6 @@ func _unhandled_input(event: InputEvent):
 	# RIGHT CLICK: Move the selected unit
 		if event.button_index == MOUSE_BUTTON_RIGHT:
 			_handle_movement(event.position)
-
-
 
 func _handle_selection(mouse_pos: Vector2):
 	var result = _get_raycast_result(mouse_pos)
@@ -52,27 +45,6 @@ func _handle_selection(mouse_pos: Vector2):
 		print("Deselected")
 
 
-#
-#func _handle_movement(mouse_pos: Vector2):
-	#if selected_unit:
-		#var result = _get_raycast_result(mouse_pos)
-		#if result:
-			## We pass the selected_unit's name or ID to the RPC
-			## so the server knows which specific unit to move
-			#MultiPlayerManager.request_move_command.rpc(selected_unit.get_path(), result.position)
-
-#func _handle_movement(mouse_pos: Vector2):
-	#if selected_unit:
-		#var result = _get_raycast_result(mouse_pos)
-		## Check if the dictionary is not empty
-		#if not result.is_empty():
-			#var target_pos = result.position
-			## The physics process and simulation will be run by every player themselves
-			## and the MultiplayerSynchronizer will be sending the updated positions to
-			## all the peers connected to the network
-			##selected_unit.set_movement_target(target_pos)
-			#MultiPlayerManager.request_move_command.rpc(selected_unit.get_path(), target_pos)
-
 func _handle_movement(mouse_pos: Vector2):
 	if selected_unit:
 		var result = _get_raycast_result(mouse_pos)
@@ -87,23 +59,6 @@ func _handle_movement(mouse_pos: Vector2):
 			}
 			# Send to server
 			SimulationManager.server_receive_command.rpc(cmd)
-
-#
-
-#func _unhandled_input(event: InputEvent):
-
-## 2. Unit Command (Right Click to move)
-
-#if event is InputEventMouseButton and event.pressed:
-
-#if event.button_index == MOUSE_BUTTON_RIGHT:
-
-#var target_pos = _get_raycast_result(event.position)
-
-#if target_pos != Vector3.ZERO:
-
-#unit.set_movement_target(target_pos)
-
 
 
 # Change the return type from Vector3 to Dictionary (or Variant)
