@@ -94,7 +94,27 @@ func _physics_process(delta: float) -> void:
 	
 	# If Avoidance is enabled, the agent calculates a safe path.
 	# This call triggers the '_on_navigation_agent_3d_velocity_computed' signal.
+	handle_rotation(delta)
 	navigation_agent.set_velocity(intended_velocity)
+
+
+
+
+# Add this inside your _physics_process or call it from there
+func handle_rotation(delta: float):
+	# We only want to rotate if the unit is actually moving
+	# and we only care about horizontal movement (X and Z)
+	var horizontal_velocity = Vector3(velocity.x, 0, velocity.z)
+	
+	if horizontal_velocity.length() > 0.1:
+		# Calculate the target look-at direction
+		var target_dir = horizontal_velocity.normalized()
+		var target_basis = Basis.looking_at(target_dir)
+		
+		# Smoothly interpolate the rotation so it doesn't "snap" instantly
+		# 10.0 is the rotation speed; higher = faster turning
+		basis = basis.slerp(target_basis, 10.0 * delta).orthonormalized()
+
 
 func _on_navigation_agent_3d_velocity_computed(safe_velocity: Vector3) -> void:
 	# Even the callback must check if we are the server

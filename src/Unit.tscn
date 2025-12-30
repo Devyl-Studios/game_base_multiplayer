@@ -1,8 +1,6 @@
-[gd_scene load_steps=5 format=3 uid="uid://qoslefpgi73t"]
+[gd_scene load_steps=6 format=3 uid="uid://qoslefpgi73t"]
 
 [ext_resource type="Script" uid="uid://c07bv46yo0hoy" path="res://src/units.gd" id="1_6ap6o"]
-
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_oyv71"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_6ap6o"]
 
@@ -14,6 +12,12 @@ properties/1/path = NodePath(".:rotation")
 properties/1/spawn = true
 properties/1/replication_mode = 1
 
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_oyv71"]
+
+[sub_resource type="PrismMesh" id="PrismMesh_6ap6o"]
+lightmap_size_hint = Vector2i(14, 21)
+size = Vector3(0.7, 1, 0.27)
+
 [node name="Unit" type="CharacterBody3D"]
 script = ExtResource("1_6ap6o")
 
@@ -23,13 +27,20 @@ path_height_offset = 1.0
 avoidance_enabled = true
 debug_enabled = true
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-mesh = SubResource("CapsuleMesh_oyv71")
-
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 shape = SubResource("CapsuleShape3D_6ap6o")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_6ap6o")
+
+[node name="visuals" type="Node3D" parent="."]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="visuals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+mesh = SubResource("CapsuleMesh_oyv71")
+skeleton = NodePath("../..")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="visuals"]
+transform = Transform3D(-0.99996895, -0.007867823, -0.00023186192, 0, 0.029456837, -0.99956596, 0.007871233, -0.999535, -0.029455923, 0, 1.4994662, -0.48869956)
+mesh = SubResource("PrismMesh_6ap6o")
