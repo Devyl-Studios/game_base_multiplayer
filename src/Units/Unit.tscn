@@ -1,16 +1,8 @@
-[gd_scene load_steps=6 format=3 uid="uid://qoslefpgi73t"]
+[gd_scene load_steps=5 format=3 uid="uid://qoslefpgi73t"]
 
-[ext_resource type="Script" uid="uid://c07bv46yo0hoy" path="res://src/units.gd" id="1_6ap6o"]
+[ext_resource type="Script" uid="uid://c07bv46yo0hoy" path="res://src/Units/unit.gd" id="1_5c4v2"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_6ap6o"]
-
-[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_6ap6o"]
-properties/0/path = NodePath(".:position")
-properties/0/spawn = true
-properties/0/replication_mode = 1
-properties/1/path = NodePath(".:rotation")
-properties/1/spawn = true
-properties/1/replication_mode = 1
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_oyv71"]
 
@@ -19,7 +11,7 @@ lightmap_size_hint = Vector2i(14, 21)
 size = Vector3(0.7, 1, 0.27)
 
 [node name="Unit" type="CharacterBody3D"]
-script = ExtResource("1_6ap6o")
+script = ExtResource("1_5c4v2")
 
 [node name="NavigationAgent3D" type="NavigationAgent3D" parent="."]
 target_desired_distance = 0.1
@@ -30,9 +22,6 @@ debug_enabled = true
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 shape = SubResource("CapsuleShape3D_6ap6o")
-
-[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
-replication_config = SubResource("SceneReplicationConfig_6ap6o")
 
 [node name="visuals" type="Node3D" parent="."]
 

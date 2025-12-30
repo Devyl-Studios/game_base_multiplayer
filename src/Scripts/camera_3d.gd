@@ -61,19 +61,32 @@ func _handle_selection(mouse_pos: Vector2):
 			## so the server knows which specific unit to move
 			#MultiPlayerManager.request_move_command.rpc(selected_unit.get_path(), result.position)
 
+#func _handle_movement(mouse_pos: Vector2):
+	#if selected_unit:
+		#var result = _get_raycast_result(mouse_pos)
+		## Check if the dictionary is not empty
+		#if not result.is_empty():
+			#var target_pos = result.position
+			## The physics process and simulation will be run by every player themselves
+			## and the MultiplayerSynchronizer will be sending the updated positions to
+			## all the peers connected to the network
+			##selected_unit.set_movement_target(target_pos)
+			#MultiPlayerManager.request_move_command.rpc(selected_unit.get_path(), target_pos)
+
 func _handle_movement(mouse_pos: Vector2):
 	if selected_unit:
 		var result = _get_raycast_result(mouse_pos)
-		# Check if the dictionary is not empty
 		if not result.is_empty():
-			var target_pos = result.position
-			# The physics process and simulation will be run by every player themselves
-			# and the MultiplayerSynchronizer will be sending the updated positions to
-			# all the peers connected to the network
-			#selected_unit.set_movement_target(target_pos)
-			MultiPlayerManager.request_move_command.rpc(selected_unit.get_path(), target_pos)
-
-
+			# Plan the move for 2 ticks in the future to account for latency
+			
+			var cmd = {
+				"tick": SimulationManager.current_tick + 5,
+				"unit_id": str(selected_unit.name), # Send the NAME as a STRING
+				"type": "MOVE",
+				"target": result.position
+			}
+			# Send to server
+			SimulationManager.server_receive_command.rpc(cmd)
 
 #
 

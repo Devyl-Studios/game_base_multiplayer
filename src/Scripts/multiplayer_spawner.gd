@@ -21,7 +21,7 @@ func _init():
 
 
 func _custom_spawn(data):
-	var unit_scene = preload("res://src/Unit.tscn")
+	var unit_scene = preload("res://src/Units/Unit.tscn")
 	var unit = unit_scene.instantiate()
 	
 	# 1. Set Authority first

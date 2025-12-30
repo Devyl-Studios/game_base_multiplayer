@@ -1,8 +1,9 @@
-[gd_scene load_steps=5 format=3 uid="uid://cf4ypyvw45qlw"]
+[gd_scene load_steps=6 format=3 uid="uid://cf4ypyvw45qlw"]
 
-[ext_resource type="Script" uid="uid://dyvgayp627r4n" path="res://src/camera_3d.gd" id="2_hk4rc"]
-[ext_resource type="Script" uid="uid://paqp0m0xiqih" path="res://src/multiplayer_spawner.gd" id="3_chrbn"]
-[ext_resource type="PackedScene" uid="uid://qoslefpgi73t" path="res://src/Unit.tscn" id="4_vjwby"]
+[ext_resource type="Script" uid="uid://b47lnpugamql7" path="res://src/units_container.gd" id="2_5qjmp"]
+[ext_resource type="Script" uid="uid://dyvgayp627r4n" path="res://src/Scripts/camera_3d.gd" id="2_hk4rc"]
+[ext_resource type="Script" uid="uid://paqp0m0xiqih" path="res://src/Scripts/multiplayer_spawner.gd" id="3_chrbn"]
+[ext_resource type="PackedScene" uid="uid://qoslefpgi73t" path="res://src/Units/Unit.tscn" id="4_vjwby"]
 
 [sub_resource type="NavigationMesh" id="NavigationMesh_4gxt3"]
 vertices = PackedVector3Array(-10, 1, -14, -10, 1, 14, 10, 1, 14, 10, 1, -14)
@@ -23,8 +24,10 @@ transform = Transform3D(1, 0, 0, 0, 0.86602545, 0.5000001, 0, -0.5000001, 0.8660
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.9659259, 0.25881907, 0, -0.25881907, 0.9659258, 0, 5, 15)
 script = ExtResource("2_hk4rc")
+pan_speed = null
 
 [node name="Units" type="Node3D" parent="."]
+script = ExtResource("2_5qjmp")
 
 [node name="Unit" parent="Units" instance=ExtResource("4_vjwby")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 0)

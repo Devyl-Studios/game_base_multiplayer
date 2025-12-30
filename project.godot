@@ -18,7 +18,8 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-MultiPlayerManager="*res://src/multi_player_manager.gd"
+MultiPlayerManager="*res://src/Utils/multi_player_manager.gd"
+SimulationManager="*res://src/Utils/SimulationManager.gd"
 
 [input]
 
